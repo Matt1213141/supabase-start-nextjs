@@ -1,13 +1,13 @@
+'use client';
 import React from 'react';
 
 interface AuthLayoutProps {
-  children: React.ReactNode;
   title?: string;
   fields: { label: string; name: string; type?: string }[];
-  onSubmit: (values: Record<string, string>) => void;
+  onSubmit: () => void;
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title = 'Authentication', fields, onSubmit }) => {
+export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, fields, onSubmit }) => {
   const [formValues, setFormValues] = React.useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     fields.forEach(f => { initial[f.name] = ''; });
@@ -20,7 +20,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title = 'Authenticati
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formValues);
+    onSubmit();
   };
 
   return (
@@ -44,7 +44,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title = 'Authenticati
         <button type="submit" style={{ width: '100%', padding: 10, borderRadius: 4, background: '#0070f3', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16 }}>
           Submit
         </button>
-        {children}
       </form>
     </div>
   );
