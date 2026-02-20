@@ -50,22 +50,13 @@ export default function Navbar() {
         </div>
       </div>
       <div>
-        {user ? (
-          <button
-            className="px-4 py-2 rounded bg-gray-200 text-gray-900 font-semibold hover:bg-gray-300 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-        ) : (
-          <button
-            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-            onClick={handleSignIn}
-          >
-            Sign In
-          </button>
-        )}
-      </div>
+        <button
+          className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+          onClick={user ? handleSignOut : handleSignIn}
+        >
+          {user ? "Sign Out" : "Sign In"}
+        </button>
+      </div> 
     </nav>
   );
 }

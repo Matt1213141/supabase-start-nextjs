@@ -14,6 +14,7 @@ export default function SettingsPage() {
     if (!loading && !user) {
       router.push('/login');
     }
+    console.log('User in settings page:', user);
   }, [user, loading, router]);
 
   function handleProfilePictureClick() {
@@ -25,9 +26,24 @@ export default function SettingsPage() {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
         console.log('Selected file:', file);
-        // Here you would typically upload the file to your server or a storage service
-        // and then update the user's profile with the new avatar URL.
-        // For this example, we'll just log the file and show an alert.
+        // Upload the file to Supabase Storage and update the user's profile with the new avatar URL
+        const formData = new FormData();
+        formData.append('avatar', file);
+        try {
+          const response = await fetch('/api/update-avatar', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include', // Include cookies for authentication
+          })
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update profile picture');
+          }
+        } catch (error) {
+          console.error('Error updating profile picture:', error);
+          alert('Failed to update profile picture. Please try again.');
+          return;
+        }
         alert('Profile picture updated successfully!');
       }
     };
@@ -39,18 +55,39 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="w-full h-full min-h-screen text-2xl flex justify-center items-center">
+    <div className="w-full p-8 h-full min-h-screen text-2xl flex flex-col items-center">
       <h1>Settings Page for {user.email}</h1>
-      <div className="flex flex-row mt-4">
+      <div className="w-full flex flex-row mt-4 justify-between items-center">
         {/* Show profile picture if it exists */}
-        <img
-          src={user.avatar_url || '/default_icon.png'}
-          alt="Profile Picture"
-          className="w-16 h-16 rounded-full cursor-pointer"
-          onClick={handleProfilePictureClick}
-        />
-        {/* Additional settings content can go here */}
-      </div>  
+        <div className="mr-4 max-w-3xl">
+          Profile Picture:
+        </div>
+        <div className="flex flex-row gap-4 items-center">
+          <button className="text-lg px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:cursor-pointer hover:bg-blue-700 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+            onClick={handleProfilePictureClick}
+          >
+            Edit
+          </button>
+          <img
+            src={user.avatar_url || '/default_icon.png'}
+            alt="Profile Picture"
+            className="w-16 h-16 rounded-full cursor-pointer"
+            onClick={handleProfilePictureClick}
+            />
+        </div>
+      </div>
+      <div className="w-full flex flex-row mt-4 justify-between items-center">
+        <p className="mr-4 max-w-3xl">
+          Name: 
+        </p>
+        <p className="flex flex-row gap-4 items-center">
+          <button className="text-lg px-4 py-2 rounded bg-blue-600 text-white hover:cursor-pointer font-semibold hover:bg-blue-700 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">
+            Edit
+          </button>
+          {user.user_metadata.name || 'No name set'}
+        </p>
+      </div>
+      {/* Additional settings content can go here */}
     </div>
   )
 }
