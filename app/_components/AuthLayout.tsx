@@ -1,52 +1,73 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuthLayoutProps {
   title?: string;
-  fields: { label: string; name: string; type?: string }[];
+  fields: { 
+    label: string; 
+    name: string; 
+    type?: string;
+    value?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+   }[];
   onSubmit: () => void;
+  submitButtonLabel?: string;
 }
 
-export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, fields, onSubmit }) => {
-  const [formValues, setFormValues] = React.useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    fields.forEach(f => { initial[f.name] = ''; });
-    return initial;
-  });
+export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, fields, onSubmit, submitButtonLabel = title?.toLowerCase() === 'login' ? 'Login' : 'Register' }) => {
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormValues({ ...formValues, [e.target.name]: e.target.value });
-  };
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit();
   };
 
+  function goToRegister() {
+    router.push('/register');
+  }
+
+  function goToLogin() {
+    router.push('/login');
+  }
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <form onSubmit={handleSubmit} style={{ minWidth: 320, padding: 32, border: '1px solid #eee', borderRadius: 8, background: '#fff', boxShadow: '0 2px 8px #eee' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 24 }}>{title}</h2>
+    <div
+      className="w-full bg-gray-100 dark:bg-zinc-800 flex flex-col items-center justify-center min-h-screen" 
+    >
+      <form onSubmit={handleSubmit} className="w-1/2 p-8 rounded-lg shadow-lg bg-white dark:bg-zinc-900 dark:text-white">
+        <h2 className="text-2xl font-bold mb-6 text-center">{title}</h2>
         {fields.map(field => (
-          <div key={field.name} style={{ marginBottom: 16 }}>
-            <label htmlFor={field.name} style={{ display: 'block', marginBottom: 4 }}>{field.label}</label>
+          <div key={field.name} className="mb-4">
+            <label htmlFor={field.name} className="block mb-1">{field.label}</label>
             <input
               id={field.name}
               name={field.name}
               type={field.type || 'text'}
-              value={formValues[field.name]}
-              onChange={handleChange}
-              style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              className="w-full p-2 border rounded"
               required
-            />
+            />    
           </div>
         ))}
-        <button type="submit" style={{ width: '100%', padding: 10, borderRadius: 4, background: '#0070f3', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16 }}>
-          Submit
+        <button type="submit" 
+          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-semibold rounded-md transition-colors"
+          >
+          {submitButtonLabel ?? (title?.toLowerCase() === 'login' ? 'Login' : 'Register')}
         </button>
       </form>
+      {title?.toLowerCase() === "login" && 
+        <p>Don't have an account? <a onClick={goToRegister} className="text-blue-600 hover:underline cursor-pointer">
+          Click here </a>to create one!</p>
+      }
+      {title?.toLowerCase() === "register" &&
+        <p>Already have an account? <a onClick={goToLogin} className="text-blue-600 hover:underline cursor-pointer">
+          Click here </a> to login!</p>
+      }
     </div>
   );
-};
+}
 
 export default AuthLayout;

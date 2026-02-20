@@ -1,90 +1,104 @@
-
+'use client';
 import { createClient } from "@/lib/supabase/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import AuthLayout from "@/app/_components/AuthLayout";
+import { Router } from "next/router";
+import { useRouter } from "next/navigation";
+import { createProfile } from "@/app/_utils/profile";
+import { useUser } from "@/app/_components/UserContext";
+import { useError } from "@/app/_components/ErrorContext";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const supabase = createClient();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { setError } = useError();
+  const { user, loading } = useUser();
 
-  const handleSubmit = (e: React.FormEvent) => {
-	e.preventDefault();
-	// Check if name, email and password are not empty
-	if (!name || !email || !password) {
-	  alert("Please enter name, email and password.");
-	  return;
+  useEffect(() => {
+	// See if user is already logged in, if so redirect to dashboard
+	if (!loading && user) {
+	  router.push('/dashboard');
 	}
-	// Call Supabase auth signUp method here
-	try {
-	  supabase.auth.signUp({
-	  email: email,
-	  password: password,
-	  options: {
-	  	data: {
-	  	  name: name
-	  	}
-	  }
-	  })
-	  .then(({ data, error }) => {
-	  	if (error) {
-	  	  alert("Registration failed: " + error.message);
-	  	} else {
-	  	  alert("Registration successful! Please check your email for confirmation.");
-	  	}
-	  });
-	} catch (error) {
-		alert("An unexpected error occurred: " + (error instanceof Error ? error.message : "Unknown error"));
-	}
+  }, [user, loading, router]);
+  
+  const handleSubmit = async () => {
+    setError(null);
+    try {
+      const supabase = createClient();  
+      if (!name || !email || !password) {
+        setError("Please enter name, email and password.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+      // Call Supabase auth signUp method here
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password.trim(),
+        options: {
+          data: {
+            name: name.trim(),
+          },
+        },
+      });  
+      if (error) {
+        setError("Registration failed: " + error.message);
+      } else {
+      	// Redirect to email verification page
+      	router.push('/verify-email');
+      	router.refresh(); // Refresh to update auth state
+      }
+    } catch (error) {
+      setError("An unexpected error occurred: " + (error instanceof Error ? error.message : "Unknown error"));
+    }
   };
 
   return (
-  	<div className="flex min-h-screen items-center justify-center bg-background text-foreground transition-colors">
-  	  <form className="w-full max-w-md p-8 rounded-lg shadow-lg bg-white dark:bg-zinc-900 dark:text-white" onSubmit={handleSubmit}>
-  	  	<h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-  	  	<div className="mb-4">
-  	  	  <label htmlFor="name" className="block mb-1 font-medium">Name</label>
-  	  	  <input
-  	  	  	type="text"
-  	  	  	id="name"
-  	  	  	name="name"
-  	  	  	className="w-full px-3 py-2 border rounded-md bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  	  	  	value={name}
-  	  	  	onChange={(e) => setName(e.target.value)}
-			required
-  	  	  />
-  	  	</div>
-  	  	<div className="mb-4">
-  	  	  <label htmlFor="email" className="block mb-1 font-medium">Email</label>
-  	  	  <input
-  	  	  	type="email"
-  	  	  	id="email"
-  	  	  	name="email"
-  	  	  	className="w-full px-3 py-2 border rounded-md bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  	  	  	value={email}
-  	  	  	onChange={(e) => setEmail(e.target.value)}
-			required
-  	  	  />
-  	  	</div>
-  	  	<div className="mb-6">
-  	  	  <label htmlFor="password" className="block mb-1 font-medium">Password</label>
-  	  	  <input
-  	  	  	type="password"
-  	  	  	id="password"
-  	  	  	name="password"
-  	  	  	className="w-full px-3 py-2 border rounded-md bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  	  	  	value={password}
-  	  	  	onChange={(e) => setPassword(e.target.value)}
-			required
-  	  	  />
-  	  	</div>
-  	  	<button
-  	  	  type="submit"
-  	  	  className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors"
-  	  	>
-  	  	  Register
-  	  	</button>
-  	  </form>
+	<div className="flex min-h-screen w-full items-center justify-center bg-background text-foreground transition-colors">
+	  <AuthLayout
+	    title="Register"
+	    fields={[{
+	      "label": "Name",
+	      "name": "name",
+	      "type": "text",
+	      "value": name,
+	      "onChange": (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)
+	    },
+	    {
+	  	  "label": "Email",
+	  	  "name": "email",
+	  	  "type": "email",
+	  	  "value": email,
+	  	  "onChange": (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)
+	    },
+	    {
+	  	  "label": "Password",
+	  	  "name": "password",
+	  	  "type": "password",
+	  	  "value": password,
+	  	  "onChange": (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)
+	    },
+	    {
+	  	  "label": "Confirm Password",
+	  	  "name": "confirm_password",
+	  	  "type": "password",
+	  	  "value": confirmPassword,
+	  	  "onChange": (e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)
+	    },
+	    ]}
+	    onSubmit={() => {
+	      handleSubmit();
+	    }}
+	  />
   	</div>
   );
 }

@@ -1,17 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Navbar() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -36,8 +34,20 @@ export default function Navbar() {
 
   return (
     <nav className="w-full flex items-center justify-between py-4 px-8 bg-white dark:bg-zinc-900 shadow mb-8">
-      <div className="text-xl font-bold text-blue-700 dark:text-white">
-        MyApp
+      <div className="flex flex-row gap-2 text-xl font-bold text-blue-700 dark:text-white">
+        {/* User icon */}
+        {user && (
+          <Link href="/settings" className="flex items-center gap-1">
+            <img 
+              src={user.avatar_url || '/default_icon.png'}
+              alt="Profile Picture"
+              className="w-8 h-8 rounded-full"
+            />
+          </Link>
+        )}
+        <div>
+          MyApp
+        </div>
       </div>
       <div>
         {user ? (

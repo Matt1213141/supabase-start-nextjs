@@ -1,16 +1,35 @@
 'use client';
 
 import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import Navbar from "@/app/_components/Navbar";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Detect if user is logged in and set user state
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    // If user is logged in, redirect to dashboard
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user]);
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 font-sans dark:bg-black">
-      <Navbar />
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start mx-auto">
         <section className="flex flex-col items-center w-full">
           <h1 className="text-3xl font-bold mb-4 text-center">Welcome!</h1>
