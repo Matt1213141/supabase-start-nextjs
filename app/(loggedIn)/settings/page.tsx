@@ -38,7 +38,7 @@ export default function SettingsPage() {
           // Call server side function to handle file upload and profile update
           const reponse = await updatePicture('', selectedFile);
           if (reponse.error) {
-            setError('Failed to update profile picture. Please try again.');
+            setError('Failed to update profile picture. Please try again.' + reponse.error);
             return;
           }
         } catch (error) {
