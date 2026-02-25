@@ -18,6 +18,8 @@ View package.json for a full list of dependencies.
 
 Docker Desktop is used with Supabase. 
 
+Note: if using Supabase via the web client, you will need to install additional dependencies. Use the __install additional dependencies__ file to install all required files. This will install homebrew, supabase, and a couple other modifications to your bashrc file. 
+
 ## Quick Start
 
 First, clone the repository via the command line with: 
@@ -50,11 +52,13 @@ Once your project is created, create a .env.local file, and copy the .env.exampl
 
 Supabase anon/publishable and secret key: 
 
-Navigate to your project settings (located on the navbar on the left hand side) -> API Keys (to the right of the navbar, but still on the left hand side) -> Copy the publishable key about halfway down the page and replace the default value in .env.local SUPABASE_ANON_KEY with this value. The secret key is here as well, just below this. 
+Navigate to your project settings (located on the navbar on the left hand side) -> API Keys (to the right of the navbar, but still on the left hand side) -> Copy the publishable key about halfway down the page and replace the default value in .env.local SUPABASE_ANON_KEY with this value. 
+
+For the secret key, stay on the API keys page, and navigate to the Legacy anon, service_role API keys. Reveal and copy the service_role key and put this in the NEXT_PRIVATE_SUPABASE_ROLE_KEY. This will be used to set up storage buckets via the CLI. 
 
 Supabase url and anon/publishable key: 
 
-Navigate to your project overview (located on the navbar on the left hand side) if you're not already there. Scroll halfway down the page to where it says "Connect to your project" and both the Project URL and Publishable API Key will be there. Copy these values into your .env.local file. 
+Navigate to your project overview (located on the navbar on the left hand side) if you're not already there. Scroll halfway down the page to where it says "Connect to your project" and both the Project URL and Publishable API Key will be there. Copy these values into your .env.local file.  
 
 #### Migrating Schemas
 
@@ -370,9 +374,12 @@ If you encounter issues while setting up or running the project, try the followi
   Clear your browser cookies and local storage, then try logging in again. Restart the browser if necessary. Ensure your Supabase API keys are valid.
 
 - **Schema or Migration Problems:**  
-  Confirm that all SQL files in `supabase/schemas/` have been run in order. Check the Supabase dashboard for migration errors.
+  Confirm that all SQL files in `supabase/schemas/` have been run in order. Check the Supabase dashboard for migration errors. With the Supabase storage buckets on the web client, those have to be created manually (without SQL). 
 
 - **Build or Deployment Fails:**  
   Run `npm install` to ensure all dependencies are installed. Review the build logs for specific error messages. Check for any files that contain errors. This will prevent the project from being deployed. 
+
+- **Limit Reached:**
+  There is a limit if using the Supabase web client. A maximum of 2 authentication emails from Supabase can be sent every hour. In other words, a maximum of 2 accounts can be created every hour. 
 
 If problems persist, consult the Supabase and Next.js documentation or open an issue in the repository.

@@ -8,11 +8,31 @@ import Link from 'next/link';
 export default function Navbar() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+      fetchAvatarUrl(data.user);
+    });
+    async function fetchAvatarUrl(user: any) {
+      if (user?.avatar_url) {
+        // Fetch the signed URL for the user's avatar
+        const { data: signedUrlData, error: signedUrlError } = await supabase
+          .storage
+          .from('avatars')
+          .createSignedUrl(user.avatar_url, 60 * 60); // URL valid for 1 hour
+        
+        if (signedUrlError) {
+          console.error('Error creating signed URL:', signedUrlError);
+        } else {
+          setAvatarUrl(signedUrlData.signedUrl);
+        }
+      }
+    }
+    fetchAvatarUrl(user);
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
@@ -39,7 +59,7 @@ export default function Navbar() {
         {user && (
           <Link href="/settings" className="flex items-center gap-1">
             <img 
-              src={user.avatar_url || '/default_icon.png'}
+              src={avatarUrl || '/default_icon.png'}
               alt="Profile Picture"
               className="w-8 h-8 rounded-full"
             />

@@ -83,15 +83,20 @@ export async function updatePicture(
         return { data: null, error: new Error(fileError.message) };
       }
 
-      const { data: fileUrlData } = supabase
+      const { data: fileUrlData, error: fileUrlError } = await supabase
         .storage
         .from('avatars')
-        .getPublicUrl(filePath, { download: true });
+        .createSignedUrl(filePath, 60 * 60); // URL valid for 1 hour
       
-      const publicUrl = fileUrlData.publicUrl;
+      if (fileUrlError) {
+        console.error('Error creating signed URL:', fileUrlError);
+        return { data: null, error: new Error(fileUrlError.message) };
+      }
+
+      const signedUrl = fileUrlData.signedUrl;
       await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: signedUrl })
         .eq('id', user?.id)
         .select() // Only fetch the updated profile
         .single(); // Update the user's profile with the new avatar URL

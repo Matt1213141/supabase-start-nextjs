@@ -4,9 +4,13 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/app/_components/UserContext";
 import LoadingBar from "@/app/_components/LoadingBar";
+import { updatePicture } from "@/app/_utils/profile";
+import { useError } from "@/app/_components/ErrorContext";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+  const { setError } = useError();
   const { user, loading } = useUser();
 
   useEffect(() => {
@@ -23,25 +27,23 @@ export default function SettingsPage() {
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        console.log('Selected file:', file);
+      const selectedFile = (event.target as HTMLInputElement).files?.[0];
+      setFile(selectedFile || null);
+      if (selectedFile) {
+        console.log('Selected file:', selectedFile);
         // Upload the file to Supabase Storage and update the user's profile with the new avatar URL
         const formData = new FormData();
-        formData.append('avatar', file);
+        formData.append('avatar', selectedFile);
         try {
-          const response = await fetch('/api/update-avatar', {
-            method: 'POST',
-            body: formData,
-            credentials: 'include', // Include cookies for authentication
-          })
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to update profile picture');
+          // Call server side function to handle file upload and profile update
+          const reponse = await updatePicture('', selectedFile);
+          if (reponse.error) {
+            setError('Failed to update profile picture. Please try again.');
+            return;
           }
         } catch (error) {
           console.error('Error updating profile picture:', error);
-          alert('Failed to update profile picture. Please try again.');
+          setError('Failed to update profile picture. Please try again.');
           return;
         }
         alert('Profile picture updated successfully!');
