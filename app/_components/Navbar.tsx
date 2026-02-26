@@ -4,44 +4,26 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { fetchAvatarUrl } from '../_utils/profile';
+import { getUser } from '../_utils/auth';
+import { useUser } from './UserContext';
 
 export default function Navbar() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { user, loading } = useUser();
 
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      fetchAvatarUrl(data.user);
-    });
-    async function fetchAvatarUrl(user: any) {
-      if (user?.avatar_url) {
-        // Fetch the signed URL for the user's avatar
-        const { data: signedUrlData, error: signedUrlError } = await supabase
-          .storage
-          .from('avatars')
-          .createSignedUrl(user.avatar_url, 60 * 60); // URL valid for 1 hour
-        
-        if (signedUrlError) {
-          console.error('Error creating signed URL:', signedUrlError);
-        } else {
-          setAvatarUrl(signedUrlData.signedUrl);
-        }
+    async function fetchAndUpdateUser() {
+      if (user) {
+        const avatarUrl = await fetchAvatarUrl(user);
+        setAvatarUrl(avatarUrl);
       }
     }
-    fetchAvatarUrl(user);
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
+    fetchAndUpdateUser();
+  }, [user]);
 
   const handleSignIn = () => {
     router.push('/login');

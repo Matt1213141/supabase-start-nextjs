@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/app/_components/UserContext";
 import LoadingBar from "@/app/_components/LoadingBar";
-import { updatePicture } from "@/app/_utils/profile";
+import { fetchAvatarUrl, updatePicture } from "@/app/_utils/profile";
 import { useError } from "@/app/_components/ErrorContext";
 
 export default function SettingsPage() {
@@ -12,13 +12,21 @@ export default function SettingsPage() {
   const [file, setFile] = useState<File | null>(null);
   const { setError } = useError();
   const { user, loading } = useUser();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Check to see if the user is logged in
     if (!loading && !user) {
       router.push('/login');
     }
-    console.log('User in settings page:', user);
+    // Fetch the user's avatar URL if the user is logged in
+    async function fetchAvatar() {
+      if (user && !loading) {
+        const avatarUrl = await fetchAvatarUrl(user);
+        setAvatarUrl(avatarUrl);
+      }
+    }
+    fetchAvatar();
   }, [user, loading, router]);
 
   function handleProfilePictureClick() {
@@ -71,7 +79,7 @@ export default function SettingsPage() {
             Edit
           </button>
           <img
-            src={user.avatar_url || '/default_icon.png'}
+            src={avatarUrl || '/default_icon.png'}
             alt="Profile Picture"
             className="w-16 h-16 rounded-full cursor-pointer"
             onClick={handleProfilePictureClick}
