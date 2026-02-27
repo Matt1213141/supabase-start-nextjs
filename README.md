@@ -1,5 +1,9 @@
 # Supabase Setup App
 
+## NOTE: ONLY 2 ACCOUNTS CAN BE CREATED PER HOUR
+
+### Due to the limitations, if using Supabase web client, you can only send 2 verification emails, which will only be able to create 2 accounts. Ensure you use the right email when signing up
+
 This app is intended to be a baseline template for a supabase app configured with Nextjs. It is designed to make setting a up a Supabase project much simpler with the template. With low computer resources, the database schemas defined in supabase/schemas need to be run in order on the supabase web client. A Supabase setup script will be provided, *__but may encounter some issues during development__*. 
 
 Normally, Docker Desktop would be used with the Supabase CLI. Ensure you have enough memory on your computer (at least 16 GB). If you have less than this, use the Supabase web client. 
@@ -202,7 +206,36 @@ The avatars storage bucket provides secure file storage for user profile picture
 - **Public Access**: Disabled (private bucket requiring authentication)
 - Users can upload and manage their avatar images through this bucket
 
-To upload avatars, use the Supabase storage client with the bucket name `avatars` and the user's unique file path.
+To upload avatars, use the Supabase storage client with the bucket name `avatars` and the user's unique file path.,
+
+#### Setup for avatars (only if using web client)
+
+Additional setup will be required if using the web client. Ensure you have the project ref and service role key in the .env.local file before proceeding. 
+
+Before we are able to use the CLI for supabase, ensure you run the script install_dependencies.sh from a linux environment. Run the script link_supabase_project.sh to create the storage bucket for avatars. You will need to login to your supabase project and authenticate it via a one time verification code. At the end of the script, you will either get no response (which means creating the bucket was successful) or a 409 error (which means the bucket already exists). Both of these results are okay to get. 
+
+Now, this next part is recommended to be completed via the web dashboard manually (SQL not recommended, but is provided in 003_storage_bucket_policies.sql. You can view this to see how similar it is to your bucket). 
+
+On the dashboard, go to the navbar on the left hand side, and go to storage. Click on your bucket name -> near the top right, is a button for policies; click that -> scroll to your bucket name -> new policy -> for full customization -> select all operations (in our case, though you can change it) -> target roles (at least choose authenticated). 
+
+IMPORTANT: In order to make this accessible only to the user themself, go to the navbar again on the left hand side -> database -> policies -> scroll down to your policies -> inside the using or with check statement, there should be a (bucket_id = 'bucket_id'::text) line. Add a new line below that (in both the using and with check statements) and add the line: 
+
+```sql
+AND owner = (select auth.uid())
+```
+
+The entire statement will look something like this: 
+
+```sql
+alter policy '<whatever the policy name is here>'
+on "storage"."objects"
+to authenticated
+using ( -- Might be with check here 
+  ((bucket_id = 'avatars'::text) AND (owner = ( SELECT auth.uid() AS uid)))
+);
+```
+
+Repeat the previous steps for all policies you created. Feel free to check your policies with 003_storage_bucket_policies.sql. 
 
 ## Authentication Flow
 
