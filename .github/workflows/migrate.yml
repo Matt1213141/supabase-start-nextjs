@@ -29,5 +29,8 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          apt-get update && apt-get install -y postgresql-client
+          sudo apt-get update && sudo apt-get install -y postgresql-client dnsutils
+          echo "Testing DNS for $SUPABASE_PROJECT_REF.db.supabase.co"
+          dig "$SUPABASE_PROJECT_REF.db.supabase.co"
+          echo "Testing DB connection with psql"
           PGPASSWORD="$SUPABASE_SERVICE_ROLE_KEY" psql -h "$SUPABASE_PROJECT_REF.db.supabase.co" -U postgres -d postgres -c '\conninfo'
