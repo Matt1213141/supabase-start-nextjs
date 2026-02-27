@@ -29,5 +29,7 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
+          apt-get update && apt-get install -y dnsutils
+          dig ${{ secrets.SUPABASE_PROJECT_REF }}.db.supabase.co
           npx supabase db push --db-url "postgresql://postgres:${SUPABASE_SERVICE_ROLE_KEY}@${SUPABASE_PROJECT_REF}.db.supabase.co:5432/postgres" --debug
 
