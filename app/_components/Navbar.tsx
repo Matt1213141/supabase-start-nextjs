@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchAvatarUrl } from '../_utils/profile';
 import { getUser } from '../_utils/auth';
-import { useUser } from './UserContext';
+import { useUser } from './Contexts/UserContext';
+import { buttonStyles } from '../_globals/ButtonStyles';
 
 export default function Navbar() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function Navbar() {
       </div>
       <div>
         <button
-          className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+          className={user ? buttonStyles.danger : buttonStyles.primary}
           onClick={user ? handleSignOut : handleSignIn}
         >
           {user ? "Sign Out" : "Sign In"}

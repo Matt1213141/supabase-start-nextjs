@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { buttonStyles } from '@/app/_globals/ButtonStyles';
 
 interface AuthLayoutProps {
   title?: string;
@@ -53,7 +54,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, fields, onSubmit,
           </div>
         ))}
         <button type="submit" 
-          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-semibold rounded-md transition-colors"
+          className={buttonStyles.primary}
           >
           {submitButtonLabel ?? (title?.toLowerCase() === 'login' ? 'Login' : 'Register')}
         </button>

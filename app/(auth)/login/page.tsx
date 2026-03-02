@@ -1,7 +1,8 @@
 'use client';
 import AuthLayout from "@/app/_components/AuthLayout";
-import { useError } from "@/app/_components/ErrorContext";
-import { useUser } from "@/app/_components/UserContext";
+import { useError } from "@/app/_components/Contexts/ErrorContext";
+import { useSuccess } from "@/app/_components/Contexts/SuccessContext";
+import { useUser } from "@/app/_components/Contexts/UserContext";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setError } = useError();
+  const { setSuccess } = useSuccess();
   const { user, loading } = useUser();
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function LoginPage() {
 	  if (error) {
 	  	setError("Login failed: " + error.message);
 	  } else {
-	  	setError("Login successful! Welcome, " + data?.user?.email);
+	  	setSuccess("Login successful! Welcome, " + data?.user?.email);
 	  	// Redirect to home page or dashboard
 	  	router.push('/dashboard');
 		router.refresh(); // Refresh to update auth state

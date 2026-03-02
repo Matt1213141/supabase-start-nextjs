@@ -5,8 +5,9 @@ import AuthLayout from "@/app/_components/AuthLayout";
 import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 import { createProfile } from "@/app/_utils/profile";
-import { useUser } from "@/app/_components/UserContext";
-import { useError } from "@/app/_components/ErrorContext";
+import { useUser } from "@/app/_components/Contexts/UserContext";
+import { useError } from "@/app/_components/Contexts/ErrorContext";
+import { useSuccess } from "@/app/_components/Contexts/SuccessContext";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { setError } = useError();
+  const { setSuccess } = useSuccess();
   const { user, loading } = useUser();
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function RegisterPage() {
       if (error) {
         setError("Registration failed: " + error.message);
       } else {
+      	setSuccess("Registration successful! Please check your email for verification instructions.");
       	// Redirect to email verification page
       	router.push('/verify-email');
       	router.refresh(); // Refresh to update auth state

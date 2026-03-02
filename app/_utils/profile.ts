@@ -65,6 +65,33 @@ export async function createProfile(
   }
 }
 
+export async function updateUserName(
+  newName: string,
+  additionalParams: Record<string, any> = {}
+): Promise<{ data: Profile | null; error: Error | null }> {
+  try {
+    const supabase = await createClient();
+    const { user } = await getUser();
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ name: newName.trim() })
+      .eq('id', user?.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user name:', error);
+      return { data: null, error: new Error(error.message) };
+    }
+
+    return { data: data as Profile, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error('Failed to update user name');
+    console.error('Unexpected error updating user name:', error);
+    return { data: null, error };
+  }
+}
+
 export async function updatePicture(
   avatar_url: string,
   avatar: File | null

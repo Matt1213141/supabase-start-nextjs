@@ -1,10 +1,9 @@
 'use client';
 
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import Navbar from "@/app/_components/Navbar";
 import { useRouter } from "next/navigation";
+import { buttonStyles } from "@/app/_globals/ButtonStyles";
 
 
 export default function Home() {
@@ -28,6 +27,14 @@ export default function Home() {
     }
   }, [user]);
 
+  function handleLoginClick() {
+    router.push("/login");
+  }
+
+  function handleSignUpClick() {
+    router.push("/signup");
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start mx-auto">
@@ -37,8 +44,8 @@ export default function Home() {
             To get started, please log in or sign up below.
           </p>
           <div className="flex gap-4">
-            <button className="px-6 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Log In</button>
-            <button className="px-6 py-2 rounded bg-gray-200 text-gray-900 font-semibold hover:bg-gray-300 transition dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">Sign Up</button>
+            <button className={buttonStyles.primary} onClick={handleLoginClick}>Log In</button>
+            <button className={buttonStyles.secondary} onClick={handleSignUpClick}>Sign Up</button>
           </div>
         </section>
       </main>
