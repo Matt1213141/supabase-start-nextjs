@@ -28,5 +28,6 @@ jobs:
         env:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_DATABASE_PASSWORD: ${{ secrets.SUPABASE_DATABASE_PASSWORD }}
         run: |
-          npx supabase db push --db-url "postgresql://postgres.$SUPABASE_PROJECT_REF:$SUPABASE_SERVICE_ROLE_KEY@aws-0-us-west-2.pooler.supabase.com:5432/postgres"
+          npx supabase db push --db-url "postgresql://postgres.$SUPABASE_PROJECT_REF:$SUPABASE_DATABASE_PASSWORD@aws-0-us-west-2.pooler.supabase.com:5432/postgres"
