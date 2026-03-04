@@ -2,7 +2,24 @@
 
 ## NOTE: ONLY 2 ACCOUNTS CAN BE CREATED PER HOUR
 
-### Due to the limitations, if using Supabase web client, you can only send 2 verification emails, which will only be able to create 2 accounts. Ensure you use the right email when signing up
+### __Due to the limitations, if using Supabase web client, you can only send 2 verification emails, which will only be able to create 2 accounts. Ensure you use the right email when signing up__
+
+## Quick links
+
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Supabase Web Client Setup](#supabase-web-client-setup)
+  - [Migrating Schemas](#migrating-schemas)
+- [Manual Setup](#manual-setup)
+- [Project Structure](#project-structure)
+- [How to use the Starter App](#how-to-use-the-starter-app)
+- [Environment Variables](#environment-variables-overview)
+- [Database Schema](#database-schema)
+- [Avatar Storage Bucket (only on web)](#avatar-storage-bucket-002_add_avatar_buckersql)
+- [Authentication Flow](#authentication-flow)
+- [Deployment](#deployment-instructions)
+- [Github Actions](#github-actions-setup-configuration)
+- [Troubleshooting](#troubleshooting)
 
 This app is intended to be a baseline template for a supabase app configured with Nextjs. It is designed to make setting a up a Supabase project much simpler with the template. With low computer resources, the database schemas defined in supabase/schemas need to be run in order on the supabase web client. A Supabase setup script will be provided, *__but may encounter some issues during development__*. 
 
@@ -22,7 +39,7 @@ View package.json for a full list of dependencies.
 
 Docker Desktop is used with Supabase. 
 
-Note: if using Supabase via the web client, you will need to install additional dependencies. Use the __install additional dependencies__ file to install all required files. This will install homebrew, supabase, and a couple other modifications to your bashrc file. 
+Note: if using Supabase via the web client, you will need to install additional dependencies. Use the **__install_dependencies.sh__** file to install all required files. This will install homebrew, supabase, and a couple other modifications to your bashrc file. 
 
 ## Quick Start
 
@@ -47,9 +64,8 @@ bash ./setup.sh    # On git bash for windows
 
 Note: if not using the Supabase web client, you can skip this section for now. 
 
-### Supabase Web Client Setup {#web-client-setup}
+### Supabase Web Client Setup
 
-`[link text](#web-client-setup)`
 If using this project via the Supabase web client, you'll need to create a new project in Supabase inside your organization (you may need to create one if you don't already have one). Give your project a unique name and a strong password. When creating this project, you don't need to enable automatic RLS, as this is done in the schemas. 
 
 Once your project is created, create a .env.local file, and copy the .env.example file variables and paste these into the .env.local file. These will be modified in the next step
@@ -68,11 +84,10 @@ Navigate to your project overview (located on the navbar on the left hand side) 
 
 At this point, you can add tables to your database. Inside of the root /supabase folder, locate schemas, and run each of the schemas inside of the SQL Editor in Supabase in order (In the navbar on the left hand side). It is recommended to create separate files with each of the schemas. 
 
-## Manual Setup {#manual-setup}
+## Manual Setup
 
-If setting this project up with Supabase on the web, just follow the instructions mentioned above in the [Supabase Web Client Setup](#web-client-setup). However, if using the CLI for Supabase, follow along with the setup script (which will also be detailed here).
+If setting this project up with Supabase on the web, just follow the instructions mentioned above in the [Supabase Web Client Setup](#supabase-web-client-setup). However, if using the CLI for Supabase, follow along with the setup script (which will also be detailed here).
 
-[insert details here for manual setup]
 
 ## Project Structure 
 

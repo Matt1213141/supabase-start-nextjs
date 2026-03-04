@@ -29,6 +29,4 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          sudo apt-get update && sudo apt-get install -y postgresql-client dnsutils
-          dig "$SUPABASE_PROJECT_REF.db.supabase.co"
-          PGPASSWORD="$SUPABASE_SERVICE_ROLE_KEY" psql -h "$SUPABASE_PROJECT_REF.db.supabase.co" -U postgres -d postgres -c '\conninfo'
+          npx supabase db push --db-url "postgresql://postgres:$SUPABASE_SERVICE_ROLE_KEY@db.$SUPABASE_PROJECT_REF.supabase.co:5432/postgres"
