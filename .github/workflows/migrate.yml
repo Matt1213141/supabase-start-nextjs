@@ -29,4 +29,4 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          npx supabase db push --db-url "postgresql://postgres:$SUPABASE_SERVICE_ROLE_KEY@db.$SUPABASE_PROJECT_REF.supabase.co:5432/postgres"
+          npx supabase db push --db-url "postgresql://postgres.$SUPABASE_PROJECT_REF:$SUPABASE_SERVICE_ROLE_KEY@aws-0-us-west-2.pooler.supabase.com:5432/postgres"
